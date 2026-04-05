@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 class SayaMusicTrack
 {
@@ -8,17 +9,36 @@ class SayaMusicTrack
 
     public SayaMusicTrack(string title)
     {
+        Debug.Assert(title != null, "Judul track tidak boleh null!");
+        Debug.Assert(title.Length <= 100, "Judul track maksimal 100 karakter!");
+
         Random random = new Random();
         this.id = random.Next(10000, 99999);
         this.title = title;
         this.playCount = "0";
     }
 
-    public void IncreasePlayCount(int count)
+    public bool IncreasePlayCount(int count)
     {
+        Debug.Assert(count <= 10000000, "Penambahan play count maksimal 10.000.000!");
+
         int current = int.Parse(playCount);
-        current += count;
+
+        try
+        {
+            checked
+            {
+                current += count;
+            }
+        }
+        catch (OverflowException)
+        {
+            Console.WriteLine("Error: Play count melebihi batas maksimum integer!");
+            return false;
+        }
+
         playCount = current.ToString();
+        return true;
     }
 
     public void PrintTrackDetails()
@@ -26,20 +46,5 @@ class SayaMusicTrack
         Console.WriteLine($"ID: {id}");
         Console.WriteLine($"Title: {title}");
         Console.WriteLine($"Play Count: {playCount}");
-    }
-}
-
-class Program
-{
-    static void Main(string[] args)
-    {
-        SayaMusicTrack track = new SayaMusicTrack("Daniel Caesar");
-        track.PrintTrackDetails();
-
-        track.IncreasePlayCount(100);
-        track.PrintTrackDetails();
-
-        track.IncreasePlayCount(500);
-        track.PrintTrackDetails();
     }
 }
